@@ -1,8 +1,8 @@
 import '~/config/ReactotronConfig';
 
 import React from 'react';
-import { View } from 'react-native';
+import Routes from './routes';
 
-const App = () => <View />;
+const App = () => <Routes />;
 
 export default App;
