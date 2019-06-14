@@ -1,7 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import MapView from 'react-native-maps';
 
-const Map = () => (
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Creators as ModalActions } from '~/store/ducks/modal';
+
+const Map = ({ showModal }) => (
   <MapView
     style={{ flex: 1 }}
     region={{
@@ -12,7 +18,17 @@ const Map = () => (
     }}
     showsUserLocation
     loadingEnabled
+    onLongPress={({ nativeEvent: { coordinate } }) => showModal(coordinate)}
   />
 );
 
-export default Map;
+Map.propTypes = {
+  showModal: PropTypes.func.isRequired,
+};
+
+const mapDispatchToProps = dispatch => bindActionCreators(ModalActions, dispatch);
+
+export default connect(
+  null,
+  mapDispatchToProps,
+)(Map);
