@@ -31,6 +31,14 @@ export const UserTextInput = styled.TextInput`
   padding: 5px;
 `;
 
+export const Error = styled.Text`
+  color: #e37a7a;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+`;
+
 export const Actions = styled.View`
   flex-direction: row;
   justify-content: space-between;

@@ -4,12 +4,14 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Creators as ModalActions } from '~/store/ducks/modal';
+import { Creators as UserActions } from '~/store/ducks/user';
 
-import { Modal as ModalComponent } from 'react-native';
+import { Modal as ModalComponent, ActivityIndicator } from 'react-native';
 
 import {
   Container,
   UserTextInput,
+  Error,
   Actions,
   CancelButton,
   SaveButton,
@@ -21,23 +23,59 @@ import {
 class Modal extends Component {
   static propTypes = {
     hideModal: PropTypes.func.isRequired,
+    addUserRequest: PropTypes.func.isRequired,
     modal: PropTypes.shape({
       visible: PropTypes.bool,
+      cordinate: PropTypes.oneOfType([
+        null,
+        PropTypes.shape({
+          latitude: PropTypes.number,
+          longitude: PropTypes.number,
+        }),
+      ]),
+    }).isRequired,
+    user: PropTypes.shape({
+      loading: PropTypes.bool,
+      error: PropTypes.oneOfType([null, PropTypes.string]),
     }).isRequired,
   };
 
-  state = {};
+  state = {
+    userInput: '',
+  };
+
+  handleInputChange = userInput => this.setState({ userInput });
+
+  handleHideModal = () => {
+    const { hideModal } = this.props;
+
+    hideModal();
+    this.setState({ userInput: '' });
+  };
+
+  handleSubmit = () => {
+    const {
+      addUserRequest,
+      user,
+      modal: { coordinate },
+    } = this.props;
+    const { userInput } = this.state;
+
+    if (user.loading) return;
+
+    addUserRequest(userInput, coordinate);
+    this.setState({ userInput: '' });
+  };
 
   render() {
-    const { modal, hideModal } = this.props;
+    const { modal, user } = this.props;
+    const { userInput } = this.state;
     return (
       <ModalComponent
         animationType="slide"
         transparent
         visible={modal.visible}
-        onRequestClose={() => {
-          hideModal();
-        }}
+        onRequestClose={this.handleHideModal}
       >
         <Container>
           <Content>
@@ -47,19 +85,20 @@ class Modal extends Component {
               autoCapitalize="none"
               placeholder="Github username"
               placeholderTextColor="#999"
-              // value={place}
-              // onChangeText={place => this.setState({ place })}
+              value={userInput}
+              onChangeText={this.handleInputChange}
             />
+            {user.error && <Error>{user.error}</Error>}
             <Actions>
-              <CancelButton
-                onPress={() => {
-                  hideModal();
-                }}
-              >
+              <CancelButton onPress={this.handleHideModal}>
                 <ActionText>Cancel</ActionText>
               </CancelButton>
-              <SaveButton onPress={() => {}}>
-                <ActionText>Save</ActionText>
+              <SaveButton onPress={this.handleSubmit}>
+                {user.loading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <ActionText>Save</ActionText>
+                )}
               </SaveButton>
             </Actions>
           </Content>
@@ -71,9 +110,10 @@ class Modal extends Component {
 
 const mapStateToProps = state => ({
   modal: state.modal,
+  user: state.user,
 });
 
-const mapDispatchToProps = dispatch => bindActionCreators(ModalActions, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({ ...ModalActions, ...UserActions }, dispatch);
 
 export default connect(
   mapStateToProps,

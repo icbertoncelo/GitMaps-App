@@ -26,7 +26,7 @@
     "react/jsx-one-expression-per-line": "off",
     "react-native/no-color-literals": "off",
     "react-native/sort-styles": "off",
-    "react/jsx-max-props-per-line": [2, { "when": "always" }],
+    "react/jsx-max-props-per-line": [3, { "when": "always" }],
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
   },
   "settings": {
